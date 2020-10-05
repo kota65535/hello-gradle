@@ -29,8 +29,4 @@ jobs:
         env:
           # Use Personal Token for now
           GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
-        run: |
-          mvn -B build-helper:parse-version release:prepare release:perform \
-            -DreleaseVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion} \
-            -Dtag=v\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion}
-
+        run: ./gradlew publish
