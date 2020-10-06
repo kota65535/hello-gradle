@@ -9,14 +9,15 @@ task setReleaseVersion {
         def matcher = version =~ /^(\d+)\.(\d+)\.(\d+)-SNAPSHOT$/
         assert matcher.matches()
         def (major, minor, patch) = matcher[0][1..3].collect { v -> v as Integer}
+        // set new version
         version = "${major}.${minor}.${patch}"
-
         writeVersionFile(version)
     }
     doLast {
         def tag = "v${version}"
         exec { commandLine "git", "add", "gradle.properties" }
         exec { commandLine "git", "commit", "-m", "prepare release ${tag}" }
+        exec { commandLine "git", "tag", "${tag}" }
     }
 }
 
@@ -25,8 +26,8 @@ task setDevelopmentVersion {
         def matcher = version =~ /^(\d+)\.(\d+)\.(\d+)$/
         assert matcher.matches()
         def (major, minor, patch) = matcher[0][1..3].collect { v -> v as Integer}
+        // set new version
         version = "${major}.${minor}.${patch + 1}-SNAPSHOT"
-
         writeVersionFile(version)
     }
     doLast {
@@ -38,10 +39,8 @@ task setDevelopmentVersion {
 task prepareRelease {
     dependsOn setReleaseVersion
     doFirst {
-        def tag = "v${version}"
-        exec { commandLine "git", "tag", "${tag}" }
         exec { commandLine "git", "push", "origin", "HEAD" }
-        exec { commandLine "git", "push", "origin", "${tag}" }
+        exec { commandLine "git", "push", "origin", "--tags" }
     }
 }
 
