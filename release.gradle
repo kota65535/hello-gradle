@@ -44,7 +44,7 @@ task prepareRelease {
     doFirst {
         exec { commandLine "git", "tag", "${version}" }
         exec { commandLine "git", "push", "origin", "HEAD" }
-        exec { commandLine "git", "push", "origin", "${version}" }
+        exec { commandLine "git", "push", "origin", "v${version}" }
     }
 }
 
