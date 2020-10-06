@@ -29,4 +29,4 @@ jobs:
         env:
           # Use Personal Token for now
           GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
-        run: ./gradlew publish
+        run: ./gradlew prepareRelease performRelease

@@ -1,0 +1,53 @@
+task setReleaseVersion {
+    doFirst {
+        def matcher = version =~ /^(\d+)\.(\d+)\.(\d+)-SNAPSHOT$/
+        assert matcher.matches()
+        def (major, minor, patch) = matcher[0][1..3]
+        version = "${major}.${minor}.${patch}"
+
+        File f = file("gradle.properties")
+        String s = f.getText().replaceFirst(/version = .*/, "version = ${version}")
+        f.setText(s)
+    }
+    doLast {
+        exec { commandLine "git", "add", "gradle.properties" }
+        exec { commandLine "git", "commit", "-m", "prepare release v${version}" }
+    }
+}
+
+task setDevelopmentVersion {
+    doFirst {
+        def matcher = version =~ /^(\d+)\.(\d+)\.(\d+)$/
+        assert matcher.matches()
+        def (major, minor, patch) = matcher[0][1..3]
+        def newPatch = ((patch as Integer) + 1) as String
+        version = "${major}.${minor}.${newPatch}-SNAPSHOT"
+
+        File f = file("${projectDir}/gradle.properties")
+        String s = f.getText().replaceFirst(/version = .*/, "version = ${version}")
+        f.setText(s)
+    }
+    doLast {
+        exec { commandLine "git", "add", "gradle.properties" }
+        exec { commandLine "git", "commit", "-m", "prepare for next development iteration" }
+    }
+}
+
+task tag {
+    doFirst {
+        exec { commandLine "git", "tag", "v${version}" }
+    }
+}
+
+task prepareRelease {
+    dependsOn setReleaseVersion
+    doFirst {
+        exec { commandLine "git", "tag", "${version}" }
+        exec { commandLine "git", "push", "origin", "HEAD" }
+        exec { commandLine "git", "push", "origin", "${version}" }
+    }
+}
+
+task performRelease {
+    dependsOn publish, setDevelopmentVersion
+}

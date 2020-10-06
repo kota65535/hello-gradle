@@ -22,7 +22,11 @@ publishing {
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
+                username = "kota65535"
+                password = "574a7ef15a7d66155d61f155b5c000059a7da76d"
             }
         }
     }
 }
+
+apply from: 'release.gradle'
